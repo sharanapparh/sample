@@ -1,5 +1,4 @@
 pipeline {
-
     agent any
 
     environment {
@@ -7,16 +6,11 @@ pipeline {
         TAG = "${BUILD_NUMBER}"
     }
 
-    triggers {
-        githubPush()
-    }
-
     stages {
-
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
-                url: 'https://github.com/sharanapparh/sample.git'
+                    url: 'https://github.com/sharanapparh/sample.git'
             }
         }
 
@@ -26,57 +20,37 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                sh 'echo "Running unit tests..."'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
-                sh """
-                docker build -t $DOCKER_IMAGE:$TAG .
-                """
+                sh 'docker build -t ${DOCKER_IMAGE}:${TAG} .'
             }
         }
-        stage('Login to Docker Hub') 
 
-             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
-                usernameVariable: 'USER',
-                passwordVariable: 'PASS')]) {
-
-                    sh """
-                    echo $PASS | docker login -u $USER --password-stdin
-                    """
+        stage('Login to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    sh 'echo $PASS | docker login -u $USER --password-stdin'
                 }
             }
         }
 
         stage('Push Image') {
             steps {
-                sh """
-                docker push $DOCKER_IMAGE:$TAG
-                """
+                sh 'docker push ${DOCKER_IMAGE}:${TAG}'
             }
         }
-
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh """
-                kubectl set image deployment/flask-app flask-app=$DOCKER_IMAGE:$TAG
-                kubectl rollout status deployment/flask-app
-                """
-            }
-        }
- 
     }
+
     post {
         success {
-            echo " Deployment Successful"
+            echo 'Deployment Successful'
         }
         failure {
-            echo " Deployment Failed"
+            echo 'Deployment Failed'
         }
     }
 }
