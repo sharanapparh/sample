@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "sharan112/flask-app"
-        TAG = "${2b4971817081}"
+        TAG = "${BUILD_NUMBER}"
     }
 
     triggers {
@@ -68,18 +68,6 @@ pipeline {
                 """
             }
         }
-
-        stage('Terraform (Optional Infra)') {
-            steps {
-                dir('terraform') {
-                    sh """
-                    terraform init
-                    terraform apply -auto-approve
-                    """
-                }
-            }
-        }
-    }
 
     post {
         success {
