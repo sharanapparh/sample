@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "yourdockerhub/flask-app"
-        TAG = "${BUILD_NUMBER}"
+        DOCKER_IMAGE = "sharan112/flask-app"
+        TAG = "${2b4971817081}"
     }
 
     triggers {
@@ -15,7 +15,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
-                url: 'https://github.com/your-repo.git'
+                url: 'https://github.com/sharanapparh/sample.git'
             }
         }
 
@@ -83,10 +83,10 @@ pipeline {
 
     post {
         success {
-            echo "🚀 Deployment Successful"
+            echo " Deployment Successful"
         }
         failure {
-            echo "❌ Deployment Failed"
+            echo " Deployment Failed"
         }
     }
 }
