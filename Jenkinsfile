@@ -1,8 +1,7 @@
 pipeline {
-agent any
+    agent any
 
-```
-environment {
+  environment {
     DOCKER_IMAGE = "sharan112/flask-app"
     TAG = "${BUILD_NUMBER}"
 }
@@ -55,6 +54,6 @@ post {
         echo 'Deployment Failed'
     }
 }
-```
+
 
 }
