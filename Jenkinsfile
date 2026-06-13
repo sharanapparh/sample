@@ -1,56 +1,60 @@
 pipeline {
-    agent any
+agent any
 
-    environment {
-        DOCKER_IMAGE = "sharan112/flask-app"
-        TAG = "${BUILD_NUMBER}"
+```
+environment {
+    DOCKER_IMAGE = "sharan112/flask-app"
+    TAG = "${BUILD_NUMBER}"
+}
+
+stages {
+
+    stage('Checkout Code') {
+        steps {
+            git branch: 'main',
+                url: 'https://github.com/sharanapparh/sample.git'
+        }
     }
 
-    stages {
-        stage('Checkout Code') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/sharanapparh/sample.git'
-            }
+    stage('Build Docker Image') {
+        steps {
+            sh """
+            docker build -t $DOCKER_IMAGE:$TAG .
+            """
         }
+    }
 
-        stage('Install Dependencies') {
-            steps {
-                sh 'pip install -r requirements.txt'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t ${DOCKER_IMAGE}:${TAG} .'
-            }
-        }
-
-        stage('Login to Docker Hub') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'USER',
-                    passwordVariable: 'PASS'
-                )]) {
-                    sh 'echo $PASS | docker login -u $USER --password-stdin'
-                }
-            }
-        }
-
-        stage('Push Image') {
-            steps {
-                sh 'docker push ${DOCKER_IMAGE}:${TAG}'
+    stage('Login to Docker Hub') {
+        steps {
+            withCredentials([usernamePassword(
+                credentialsId: 'dockerhub-creds',
+                usernameVariable: 'USER',
+                passwordVariable: 'PASS'
+            )]) {
+                sh """
+                echo \$PASS | docker login -u \$USER --password-stdin
+                """
             }
         }
     }
 
-    post {
-        success {
-            echo 'Deployment Successful'
-        }
-        failure {
-            echo 'Deployment Failed'
+    stage('Push Docker Image') {
+        steps {
+            sh """
+            docker push $DOCKER_IMAGE:$TAG
+            """
         }
     }
+}
+
+post {
+    success {
+        echo 'Deployment Successful'
+    }
+    failure {
+        echo 'Deployment Failed'
+    }
+}
+```
+
 }
