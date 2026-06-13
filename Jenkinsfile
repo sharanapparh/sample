@@ -1,4 +1,5 @@
 pipeline {
+
     agent any
 
     environment {
@@ -38,9 +39,9 @@ pipeline {
                 """
             }
         }
+        stage('Login to Docker Hub') 
 
-        stage('Login to Docker Hub') {
-            steps {
+             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
                 usernameVariable: 'USER',
                 passwordVariable: 'PASS')]) {
@@ -68,7 +69,8 @@ pipeline {
                 """
             }
         }
-
+ 
+    }
     post {
         success {
             echo " Deployment Successful"
