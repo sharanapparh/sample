@@ -1,5 +1,10 @@
 pipeline {
     agent any
+     
+   tools {
+      sonarQube 'SonarScanner'
+   }
+
 
     environment {
         DOCKER_IMAGE = "sharan112/flask-app"
